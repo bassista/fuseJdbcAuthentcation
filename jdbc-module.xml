@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jaas="http://karaf.apache.org/xmlns/jaas/v1.0.0"
+  xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+				http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
+				http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+  <jaas:config name="karaf" rank="100">
+    <jaas:module className="io.fabric8.jaas.ZookeeperLoginModule" flags="sufficient"/>
+    <jaas:module className="org.apache.karaf.jaas.modules.jdbc.JDBCLoginModule"
+                 flags="optional">
+        datasource = osgi:javax.sql.DataSource/(osgi.jndi.service.name=jdbc/karafdb)
+        query.password = SELECT PASSWORD FROM USERS WHERE USERNAME=?
+        query.role = SELECT ROLE FROM ROLES WHERE USERNAME=?
+        insert.user = INSERT INTO USERS VALUES(?,?)
+        insert.role = INSERT INTO ROLES VALUES(?,?)
+        delete.user = DELETE FROM USERS WHERE USERNAME=?
+        delete.role = DELETE FROM ROLES WHERE USERNAME=? AND ROLE=?
+        delete.roles = DELETE FROM ROLES WHERE USERNAME=?
+  detailed.login.exception = true
+    </jaas:module>
+  </jaas:config>
+</blueprint>
